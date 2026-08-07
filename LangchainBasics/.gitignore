@@ -1,0 +1,6 @@
+.env
+.venv
+oracleJdk-26/
+*.zip
+*.exe
+*.msi
