@@ -6,5 +6,11 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
+.env
 .venv
+oracleJdk-26/
+*.zip
+*.exe
+*.msi
+.env
+.env.*
