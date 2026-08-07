@@ -106,7 +106,7 @@ else:
             
             try:
                 # Stream response from Groq
-                for chunk in my_bot_engine .stream({"question": question}):
+                for chunk in my_bot_engine.stream({"question": question}):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 
