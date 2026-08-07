@@ -2,6 +2,10 @@
 Simple LangChain Streamlit App with Groq
 A beginner-friendly version focusing on core concepts
 """
+# What is langchain ? It is a framework for developing applications powered by language models.
+# It provides a standard interface for all LLMs, as well as tools for prompt management, memory, and more.
+# It allows developers to build applications that can interact with users in natural language, 
+# making it easier to create chatbots, question-answering systems, and other AI-powered applications.
 
 import streamlit as st
 from langchain.chat_models import init_chat_model
