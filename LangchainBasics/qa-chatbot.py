@@ -9,6 +9,7 @@ A beginner-friendly version focusing on core concepts
 
 import streamlit as st
 from langchain_groq import ChatGroq
+from langchain.chat_models import init_chat_model
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage,AIMessage
 from langchain_core.prompts import ChatPromptTemplate
