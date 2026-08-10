@@ -8,7 +8,6 @@ A beginner-friendly version focusing on core concepts
 # making it easier to create chatbots, question-answering systems, and other AI-powered applications.
 
 import streamlit as st
-from langchain.chat_models import init_chat_model
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage,AIMessage
