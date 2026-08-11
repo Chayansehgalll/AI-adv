@@ -6,5 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "langchain-huggingface>=1.2.2",
+    "langchain-text-splitters>=1.1.2",
+    "recursivecharactertextsplitter>=0.1.0",
     "sentence-transformers>=5.7.0",
 ]
