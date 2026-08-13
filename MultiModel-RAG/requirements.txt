@@ -1,0 +1,47 @@
+# ============================================================
+# Core PDF Processing
+# ============================================================
+unstructured[all-docs]
+unstructured-inference
+pytesseract
+python-magic-bin
+
+# ============================================================
+# LangChain Ecosystem
+# ============================================================
+langchain
+langchain-community
+langchain-core
+langchain-chroma
+langchain-google-genai
+langchain-huggingface
+
+# ============================================================
+# Embeddings (HuggingFace BGE)
+# ============================================================
+sentence-transformers
+
+# ============================================================
+# Machine Learning (CPU version)
+# ============================================================
+torch
+torchvision
+torchaudio
+
+# ============================================================
+# Image & Layout Processing
+# ============================================================
+opencv-python
+layoutparser[layoutmodels,tesseract]
+
+# ============================================================
+# Utilities
+# ============================================================
+python-dotenv
+nltk
+
+# ============================================================
+# Jupyter Support
+# ============================================================
+jupyter
+ipykernel
