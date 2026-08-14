@@ -182,3 +182,83 @@ print("   • Balanced fusion using k=60 for gentle position penalties")
 print("\n" + "="*60)
 print("USAGE EXAMPLES")
 print("="*60)
+
+#########################################################
+# VISUAL REPRESENTATION OF EVERYTHING
+# #######################################################
+
+
+# ORIGINAL QUESTION: "How does Tesla make money?"
+#                           │
+#                           ▼
+# ┌─────────────────────────────────────────────────────┐
+# │                    LLM (Groq)                       │
+# │         Generates 3 Query Variations                │
+# └─────────────────────────────────────────────────────┘
+#                           │
+#           ┌───────────────┼───────────────┐
+#           ▼               ▼               ▼
+#     "Tesla revenue   "Tesla business  "Tesla income
+#       streams"         model"           sources"
+#           │               │               │
+#           ▼               ▼               ▼
+#     ┌──────────┐    ┌──────────┐    ┌──────────┐
+#     │ChromaDB  │    │ChromaDB  │    │ChromaDB  │
+#     │ Search   │    │ Search   │    │ Search   │
+#     └──────────┘    └──────────┘    └──────────┘
+#           │               │               │
+#           ▼               ▼               ▼
+#     Query A Results  Query B Results  Query C Results
+#     ┌───────────┐    ┌───────────┐    ┌───────────┐
+#     │1. Chunk1  │    │1. Chunk2  │    │1. Chunk3  │
+#     │2. Chunk2  │    │2. Chunk3  │    │2. Chunk1  │
+#     │3. Chunk4  │    │3. Chunk1  │    │3. Chunk2  │
+#     │4. Chunk3  │    │4. Chunk6  │    │4. Chunk7  │
+#     │5. Chunk5  │    │5. Chunk8  │    │5. Chunk4  │
+#     └───────────┘    └───────────┘    └───────────┘
+#           │               │               │
+#           └───────────────┼───────────────┘
+#                           │
+#                           ▼
+# ┌─────────────────────────────────────────────────────┐
+# │              RECIPROCAL RANK FUSION                 │
+# │                                                     │
+# │  score = 1 / (60 + position)                        │
+# │  Same chunk found again? += add new score on top    │
+# │                                                     │
+# │  Chunk1: 1/(60+1) + 1/(60+3) + 1/(60+2) = 0.0484  │
+# │  Chunk2: 1/(60+2) + 1/(60+1) + 1/(60+3) = 0.0484  │
+# │  Chunk3: 1/(60+4) + 1/(60+2) + 1/(60+1) = 0.0481  │
+# │  Chunk4: 1/(60+3) + 0        + 1/(60+5) = 0.0312  │
+# │  Chunk5: 1/(60+5) + 0        + 0        = 0.0154  │
+# │  Chunk6: 0        + 1/(60+4) + 0        = 0.0156  │
+# │  Chunk7: 0        + 0        + 1/(60+4) = 0.0156  │
+# │  Chunk8: 0        + 1/(60+5) + 0        = 0.0154  │
+# └─────────────────────────────────────────────────────┘
+#                           │
+#                           ▼
+# ┌─────────────────────────────────────────────────────┐
+# │                 FINAL RANKING                       │
+# │                                                     │
+# │  🏆 Rank 1 → Chunk1 (0.0484) ◄── in ALL 3 queries  │
+# │  🥈 Rank 2 → Chunk2 (0.0484) ◄── in ALL 3 queries  │
+# │  🥉 Rank 3 → Chunk3 (0.0481) ◄── in ALL 3 queries  │
+# │     Rank 4 → Chunk4 (0.0312) ◄── in 2 queries      │
+# │     Rank 5 → Chunk6 (0.0156) ◄── in 1 query only   │
+# │     Rank 6 → Chunk7 (0.0156) ◄── in 1 query only   │
+# │     Rank 7 → Chunk5 (0.0154) ◄── in 1 query only   │
+# │     Rank 8 → Chunk8 (0.0154) ◄── in 1 query only   │
+# └─────────────────────────────────────────────────────┘
+#                           │
+#                           ▼
+#               TOP CHUNKS SENT TO LLM
+#               TO GENERATE FINAL ANSWER
+
+
+# KEY TAKEAWAY:
+# ─────────────────────────────────────────────────────
+#   Appears in 3 queries → 3 scores added → HIGHEST RANK
+#   Appears in 2 queries → 2 scores added → MIDDLE RANK
+#   Appears in 1 query   → 1 score added  → LOWEST RANK
+# ─────────────────────────────────────────────────────
+#   Position 1 in ONE query < Appearing in ALL queries
