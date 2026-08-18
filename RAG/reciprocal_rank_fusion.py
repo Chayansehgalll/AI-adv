@@ -208,7 +208,7 @@ print("="*60)
 #     └──────────┘    └──────────┘    └──────────┘
 #           │               │               │
 #           ▼               ▼               ▼
-#     Query A Results  Query B Results  Query C Results
+#     Query A Results  Query B Results  Query C Result
 #     ┌───────────┐    ┌───────────┐    ┌───────────┐
 #     │1. Chunk1  │    │1. Chunk2  │    │1. Chunk3  │
 #     │2. Chunk2  │    │2. Chunk3  │    │2. Chunk1  │
