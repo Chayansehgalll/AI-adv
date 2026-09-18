@@ -84,7 +84,7 @@ model = SentenceTransformer("all-MiniLM-L6-v2") #384
 print("Embedding model ready!")
 
 
-embeddings = model.encode(documents)
+embeddings = model.encode(documents) # conver the documents into embeddings
 
 print(f"Generated {len(embeddings)} embeddings")
 print(f"Embedding size: {len(embeddings[0])}")
@@ -115,7 +115,7 @@ for i, embedding in enumerate(embeddings):
 # PART 7 — UPLOAD TO QDRANT
 # ============================================================
 
-client.upsert( #upload+insert
+client.upsert( #upload + insert
     collection_name=COLLECTION_NAME,
     points=points
 )
@@ -134,10 +134,10 @@ def search(query, top_k=3):
 
     # Search Qdrant for similar vectors
     results = client.query_points(
-        collection_name=COLLECTION_NAME,
-        query=query_vector,
-        limit=top_k,
-        with_payload=True,
+        collection_name=COLLECTION_NAME,   # "knowledge"
+        query=query_vector,                # [0.34, -0.12, 0.78, ..., 0.55]
+        limit=top_k,                       # 3
+        with_payload=True,                 # True
     ).points
 
     return results
@@ -175,20 +175,20 @@ groq_client = Groq(
 def ask_llm(question, context):
 
     prompt = f"""
-Answer the question using only the information provided below.
+        Answer the question using only the information provided below.
 
-Context:
-{context}
+        Context:
+        {context}
 
-Question:
-{question}
+        Question:
+        {question}
 
-If the answer is not present in the context, say:
-"I don't know based on the provided information."
-"""
+        If the answer is not present in the context, say:
+        "I don't know based on the provided information."
+        """
 
     response = groq_client.chat.completions.create(
-        model="qwen/qwen3.6-27b",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
