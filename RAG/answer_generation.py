@@ -26,6 +26,9 @@ db = Chroma(
     persist_directory=persistent_directory,
     embedding_function=embedding_model,
     collection_metadata={"hnsw:space": "cosine"}
+    # hnsw is a popular algorithm for approximate nearest neighbor search, 
+    # space="cosine" indicates that we are using cosine similarity as the distance metric for comparing vectors,
+    # and "cosine" specifies the distance metric used for similarity comparisons.
 )
 
 # -----------------------------
