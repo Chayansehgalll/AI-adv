@@ -37,3 +37,8 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Browser cookie exports — these are live login sessions, never commit them
+cookies.txt
+*cookies*.txt
+**/cookies.txt
