@@ -114,7 +114,7 @@ def run_agent(user_query: str) -> str:
     )
 
     response_message = response.choices[0].message
-    tool_calls = response_message.tool_calls
+    tool_calls = response_message.tool_calls # here AI decides which tool to use and what arguments to pass
 
     if not tool_calls:
         return response_message.content
@@ -122,21 +122,27 @@ def run_agent(user_query: str) -> str:
     messages.append(response_message)
 
     for tool_call in tool_calls:
-        function_name = tool_call.function.name
-        function_to_call = available_functions[function_name]
-        function_args = json.loads(tool_call.function.arguments)
+        function_name = tool_call.function.name # "web_search" or "calculate"
+        function_to_call = available_functions[function_name] # The actual Python function
+        function_args = json.loads(tool_call.function.arguments) # {"query": "current population..."}
 
-        function_response = function_to_call(**function_args)
+        function_response = function_to_call(**function_args) 
+        # ↑ This ACTUALLY calls web_search("current population of India 2024")
+        # Returns: "India Population 2024: 1.44 billion... (https://...)"
 
         messages.append(
             {
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "name": function_name,
-                "content": function_response,
+                "content": function_response, # ← The search result! "India Population 2024: 1.44 billion..."
             }
         )
-
+        ################### CONVO AT THIS POINT ######################
+        # 👤 User: "What is 25% of the current population of India?"
+        # 🤖 AI: "Let me search for that." [calls web_search]
+        # 🔧 Tool Result: "India's population is 1.44 billion"
+        ##############################################################
     second_response = groq.chat.completions.create(
         model=MODEL,
         messages=messages,
