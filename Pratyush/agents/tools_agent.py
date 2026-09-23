@@ -5,7 +5,7 @@ import operator as op
 import os
 from dotenv import load_dotenv
 from groq import Groq
-from tavily import TavilyClient 
+from tavily import TavilyClient
 
 load_dotenv()
 
@@ -106,49 +106,53 @@ available_functions = {
 def run_agent(user_query: str) -> str:
     messages = [{"role": "user", "content": user_query}]
 
-    response = groq.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        tools=tools,
-        tool_choice="auto",
-    )
+    print("\n" + "=" * 50)
+    print("🧠 [AI Status]: Thinking...")
 
-    response_message = response.choices[0].message
-    tool_calls = response_message.tool_calls # here AI decides which tool to use and what arguments to pass
-
-    if not tool_calls:
-        return response_message.content
-
-    messages.append(response_message)
-
-    for tool_call in tool_calls:
-        function_name = tool_call.function.name # "web_search" or "calculate"
-        function_to_call = available_functions[function_name] # The actual Python function
-        function_args = json.loads(tool_call.function.arguments) # {"query": "current population..."}
-
-        function_response = function_to_call(**function_args) 
-        # ↑ This ACTUALLY calls web_search("current population of India 2024")
-        # Returns: "India Population 2024: 1.44 billion... (https://...)"
-
-        messages.append(
-            {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "name": function_name,
-                "content": function_response, # ← The search result! "India Population 2024: 1.44 billion..."
-            }
+    while True:
+        response = groq.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            tools=tools,
+            tool_choice="auto",
         )
-        ################### CONVO AT THIS POINT ######################
-        # 👤 User: "What is 25% of the current population of India?"
-        # 🤖 AI: "Let me search for that." [calls web_search]
-        # 🔧 Tool Result: "India's population is 1.44 billion"
-        ##############################################################
-    second_response = groq.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-    )
 
-    return second_response.choices[0].message.content
+        response_message = response.choices[0].message
+        tool_calls = response_message.tool_calls
+
+        # If the AI did NOT call any tool, it has reached the final answer
+        if not tool_calls:
+            print("✅ [AI Status]: Ready with the final answer!\n" + "=" * 50 + "\n")
+            return response_message.content
+
+        messages.append(response_message)
+
+        # Loop through any tools the AI decided to call
+        for tool_call in tool_calls:
+            function_name = tool_call.function.name
+            function_args = json.loads(tool_call.function.arguments)
+
+            print(f"\n💡 [AI Decided Tool]: '{function_name}'")
+            print(f"⚙️  [AI Using Tool]  : {function_name}({json.dumps(function_args)})")
+
+            # Call the actual Python function
+            function_to_call = available_functions[function_name]
+            function_response = function_to_call(**function_args)
+
+            # Print a clean snippet of the tool output (truncated if too long)
+            preview = function_response[:180] + "..." if len(function_response) > 180 else function_response
+            print(f"📥 [Tool Output]    : {preview.strip()}")
+
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": function_name,
+                    "content": function_response,
+                }
+            )
+
+        print("\n🧠 [AI Status]: Analyzing tool results and planning next step...")
 
 
 if __name__ == "__main__":
