@@ -154,7 +154,7 @@ def run_agent(user_query: str) -> str:
 
         print("\n🧠 [AI Status]: Analyzing tool results and planning next step...")
 
-
+ 
 if __name__ == "__main__":
     query = input("Ask something: ")
     answer = run_agent(query)
