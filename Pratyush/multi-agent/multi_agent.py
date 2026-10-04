@@ -9,7 +9,7 @@ from tavily import TavilyClient
 
 # Hard cap on how many times the manager can delegate to helpers.
 # Without this, the manager could loop forever, draining your API credits.
-MAX_ATTEMPTS = 4
+MAX_ATTEMPTS = 5
 TEST_QUERY = (
     "Find the latest population estimates for Paris and London. "
     "Include the year and source link for each. Make sure both use "
